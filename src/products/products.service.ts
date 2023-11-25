@@ -13,49 +13,29 @@ export class ProductsService {
 
   private products: ProductModel[] = [];
 
-  insertProduct(title: string, desc: string, price: number): string {
-    const prodId = Math.random().toString();
-    const newProduct = new ProductModel(prodId, title, desc, price);
-    this.products.push(newProduct);
-    return prodId;
+  insertProduct(productModel: ProductModel): Promise<ProductsEntity> {
+    const { desc, price } = productModel;
+    const newProduct = new ProductsEntity();
+    newProduct.ProductsEntity(desc, price);
+    this.productRepository.save(newProduct);
+    return;
   }
 
   getProducts() {
-    return [...this.products];
+    return this.productRepository.find();
   }
 
-  getSingleProduct(prodId: string) {
-    const product = this.findProduct(prodId)[0];
-    return { ...product };
+  getSingleProduct(prodId: number) {
+    return this.productRepository.findOne({ where: { id: prodId } });
   }
 
-  updateProduct(productId: string, title: string, desc: string, price: number) {
-    const [product, index] = this.findProduct(productId);
-    const updatedProduct = { ...product };
-    if (title) {
-      updatedProduct.title = title;
-    }
-    if (desc) {
-      updatedProduct.desc = desc;
-    }
-    if (price) {
-      updatedProduct.price = price;
-    }
-
-    this.products[index] = updatedProduct;
+  updateProduct(productId: number, desc: string, price: number) {
+    const newProduct = new ProductsEntity();
+    newProduct.ProductsEntity(desc, price);
+    this.productRepository.update(productId, newProduct);
   }
 
-  deleteProduct(prodId: string) {
-    const index = this.findProduct(prodId)[1];
-    this.products.splice(index, 1);
-  }
-
-  private findProduct(id: string): [ProductModel, number] {
-    const productIndex = this.products.findIndex((prod) => prod.id === id);
-    const product = this.products[productIndex];
-    if (!product) {
-      throw new NotFoundException('Could not find product.');
-    }
-    return [product, productIndex];
+  deleteProduct(prodId: number) {
+    return this.productRepository.delete(prodId);
   }
 }

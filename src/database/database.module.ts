@@ -8,7 +8,7 @@ import { ProductsEntity } from 'src/products/database/products.entity';
       type: 'postgres',
       host: 'localhost',
       username: 'postgres',
-      password: 'postgres',
+      password: 'postgre',
       database: 'postgres',
       entities: [ProductsEntity],
       synchronize: true,

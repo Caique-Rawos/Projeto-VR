@@ -8,6 +8,6 @@ export class AppController {
   @Get()
   getHello(): { name: string } {
     //return this.appService.getHello();
-    return { name: 'teste' };
+    return { name: 'Caique Caires Ramos' };
   }
 }
