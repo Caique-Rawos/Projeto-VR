@@ -11,8 +11,6 @@ export class ProductsService {
     private productRepository: Repository<ProductsEntity>,
   ) {}
 
-  private products: ProductModel[] = [];
-
   insertProduct(productModel: ProductModel): Promise<ProductsEntity> {
     const { desc, price } = productModel;
     const newProduct = new ProductsEntity();

@@ -15,8 +15,9 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return the developer name', () => {
+      const result = appController.getDeveloper();
+      expect(result).toEqual({ Developer: 'Caique Caires Ramos' });
     });
   });
 });
