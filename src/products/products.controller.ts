@@ -6,13 +6,23 @@ import {
   Param,
   Put,
   Delete,
+  HttpCode,
+  HttpStatus,
+  BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
-
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ProductsService } from './products.service';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { ProductsDto } from './dtos/products.dto';
 import { ProductModel } from './product.model';
 
+@ApiTags('products') // Adiciona uma tag à documentação Swagger
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
@@ -21,48 +31,85 @@ export class ProductsController {
   @ApiOperation({ summary: 'Criar um novo produto' })
   @ApiBody({ type: ProductsDto })
   @ApiResponse({ status: 201, description: 'Produto criado com sucesso' })
-  @ApiResponse({ status: 400, description: 'Solicitação inválida' })
-  addProduct(
-    @Body('descricao') prodDesc: string,
-    @Body('preco') prodPrice: number,
-  ): any {
-    const product = new ProductModel();
-    product.ProductModel(prodDesc, prodPrice, '');
-    const generatedId = this.productsService.insertProduct(product);
-    return { id: generatedId };
+  @ApiResponse({ status: 400, description: 'Solicitacao Invalida' })
+  async addProduct(@Body() productDto: ProductsDto): Promise<{ id: number }> {
+    try {
+      const generatedId = await this.productsService.insertProduct(
+        new ProductModel(productDto.desc, productDto.price, ''),
+      );
+      return { id: generatedId };
+    } catch (error) {
+      throw new BadRequestException('Requisicao Invalida', error.message);
+    }
   }
 
   @Get()
-  @ApiOperation({ summary: 'Buscar todos os produto cadastrados' })
-  getAllProducts() {
+  @ApiOperation({ summary: 'Buscar todos os produtos cadastrados' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de produtos obtida com sucesso',
+  })
+  async getAllProducts(): Promise<ProductModel[]> {
     return this.productsService.getProducts();
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Buscar produto cadastrado por Id' })
   @ApiParam({ name: 'id', description: 'ID do produto' })
-  getProduct(@Param('id') prodId: number) {
-    return this.productsService.getSingleProduct(prodId);
+  @ApiResponse({ status: 200, description: 'Produto obtido com sucesso' })
+  @ApiResponse({ status: 404, description: 'Produto nao encontrado' })
+  async getProduct(@Param('id') prodId: number): Promise<ProductModel | null> {
+    try {
+      const product = await this.productsService.getSingleProduct(prodId);
+      if (!product) {
+        throw new NotFoundException('Produto nao encontrado');
+      }
+      return product;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      } else {
+        throw new BadRequestException('Requisicao Invalida', error.message);
+      }
+    }
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar produto cadastrado' })
   @ApiParam({ name: 'id', description: 'ID do produto' })
   @ApiBody({ type: ProductsDto })
-  updateProduct(
+  @ApiResponse({ status: 200, description: 'Produto atualizado com sucesso' })
+  @ApiResponse({ status: 400, description: 'Solicitacao Invalida' })
+  @HttpCode(HttpStatus.NO_CONTENT) // Define o código de status HTTP sem corpo de resposta
+  async updateProduct(
     @Param('id') prodId: number,
-    @Body('descricao') prodDesc: string,
-    @Body('preco') prodPrice: number,
-  ) {
-    this.productsService.updateProduct(prodId, prodDesc, prodPrice);
-    return null;
+    @Body() productDto: ProductsDto,
+  ): Promise<void> {
+    try {
+      await this.productsService.updateProduct(
+        prodId,
+        productDto.desc,
+        productDto.price,
+      );
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      } else {
+        throw new BadRequestException('Requisição Invalida', error.message);
+      }
+    }
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Deletar produto cadastrado por Id' })
   @ApiParam({ name: 'id', description: 'ID do produto' })
-  deleteProduct(@Param('id') prodId: number) {
-    this.productsService.deleteProduct(prodId);
-    return null;
+  @ApiResponse({ status: 200, description: 'Produto deletado com sucesso' })
+  @ApiResponse({ status: 400, description: 'Solicitação Inválida' })
+  async deleteProduct(@Param('id') prodId: number): Promise<void> {
+    try {
+      await this.productsService.deleteProduct(prodId);
+    } catch (error) {
+      throw new BadRequestException('Requisição Invalida', error.message);
+    }
   }
 }

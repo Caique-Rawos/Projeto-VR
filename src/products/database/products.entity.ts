@@ -15,19 +15,13 @@ export class ProductsEntity {
     scale: 3,
     nullable: false,
   })
-  custo: number;
+  price: number;
 
   @Column({ name: 'imagem', type: 'bytea', nullable: true })
-  imagem: string;
+  image: string;
 
-  constructor() {}
-
-  ProductsEntity(desc: string, price: number) {
+  constructor(desc: string, price: number) {
     this.desc = desc;
-    this.custo = price;
-  }
-
-  ProductsEntityId(id: number) {
-    this.id = id;
+    this.price = price;
   }
 }
