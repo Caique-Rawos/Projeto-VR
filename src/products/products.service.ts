@@ -8,6 +8,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ProductsEntity } from './database/products.entity';
 import { Repository } from 'typeorm';
 
+// Estas mensagens tambem sao utilizadas nos testes unitarios
+export const ID_ERROR_MSG: string = 'id invalido, esperando um integer';
+export const PRICE_ERROR_MSG: string = 'Preco invalido';
+export const DESC_ERROR_MSG: string = 'Descricao eh obrigatoria';
+export const NOT_FOUND_ERROR_MSG: string = 'Produto nao encontrado';
 @Injectable()
 export class ProductsService {
   constructor(
@@ -19,11 +24,11 @@ export class ProductsService {
     const { desc, price } = productModel;
 
     if (!(this.isValidPrice(price) && price !== undefined && price !== null)) {
-      throw new BadRequestException('Preço invalido');
+      throw new BadRequestException(PRICE_ERROR_MSG);
     }
 
     if (!this.isValidDesc(desc)) {
-      throw new BadRequestException('Descricao eh obrigatoria');
+      throw new BadRequestException(DESC_ERROR_MSG);
     }
 
     const newProduct = new ProductsEntity(desc, price);
@@ -37,12 +42,19 @@ export class ProductsService {
     return await this.productRepository.find();
   }
 
-  async getSingleProduct(prodId: number): Promise<ProductsEntity | undefined> {
+  async getSingleProduct(prodId: number): Promise<ProductsEntity> {
     if (!this.isValidId(prodId)) {
-      throw new BadRequestException('ID invalido, esperando um INTEGER');
+      throw new BadRequestException(ID_ERROR_MSG);
+    }
+    const product = await this.productRepository.findOne({
+      where: { id: prodId },
+    });
+
+    if (!product) {
+      throw new NotFoundException(NOT_FOUND_ERROR_MSG);
     }
 
-    return await this.productRepository.findOne({ where: { id: prodId } });
+    return product;
   }
 
   async updateProduct(
@@ -51,24 +63,18 @@ export class ProductsService {
     price: number,
   ): Promise<void> {
     if (!this.isValidId(productId)) {
-      throw new BadRequestException('ID invalido, esperando um INTEGER');
+      throw new BadRequestException(ID_ERROR_MSG);
     }
 
     if (!this.isValidPrice(price)) {
-      throw new BadRequestException('Preco invalido');
+      throw new BadRequestException(PRICE_ERROR_MSG);
     }
 
     if (!this.isValidDesc(desc)) {
-      throw new BadRequestException('Descricao eh obrigatoria');
+      throw new BadRequestException(DESC_ERROR_MSG);
     }
 
-    const productToUpdate = await this.productRepository.findOne({
-      where: { id: productId },
-    });
-
-    if (!productToUpdate) {
-      throw new NotFoundException('Produto nao encontrado');
-    }
+    const productToUpdate = await this.getSingleProduct(productId);
 
     productToUpdate.desc = desc;
     productToUpdate.price = price;
@@ -76,12 +82,12 @@ export class ProductsService {
     await this.productRepository.save(productToUpdate);
   }
 
-  deleteProduct(prodId: number) {
+  async deleteProduct(prodId: number) {
     if (!this.isValidId(prodId)) {
-      throw new BadRequestException('ID invalido, esperando um INTEGER');
+      throw new BadRequestException(ID_ERROR_MSG);
     }
 
-    return this.productRepository.delete(prodId);
+    await this.productRepository.delete(prodId);
   }
 
   /**
@@ -91,14 +97,13 @@ export class ProductsService {
    */
   isValidId(idValue: number): boolean {
     try {
-      if (Math.floor(idValue) != idValue) {
+      if (!idValue) {
         return false;
       }
+      return Math.floor(idValue) == idValue;
     } catch (error) {
       return false;
     }
-
-    return true;
   }
 
   /**
@@ -107,6 +112,9 @@ export class ProductsService {
    * @returns booleano informando se esta valido
    */
   isValidDesc(descValue: string): boolean {
+    if (!descValue) {
+      return false;
+    }
     return descValue && descValue.trim() !== '';
   }
 
@@ -116,6 +124,9 @@ export class ProductsService {
    * @returns booleano informando se esta valido
    */
   isValidPrice(priceValue: number): boolean {
+    if (!priceValue) {
+      return false;
+    }
     const stringValue = priceValue.toString();
     const [integerPart, decimalPart] = stringValue.split('.');
 

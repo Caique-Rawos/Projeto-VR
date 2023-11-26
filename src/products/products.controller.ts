@@ -22,6 +22,8 @@ import { ProductsService } from './products.service';
 import { ProductsDto } from './dtos/products.dto';
 import { ProductModel } from './product.model';
 
+const INVALID_REQUEST_MSG: string = 'Requisicao Invalida';
+
 @ApiTags('products') // Adiciona uma tag à documentação Swagger
 @Controller('products')
 export class ProductsController {
@@ -39,7 +41,7 @@ export class ProductsController {
       );
       return { id: generatedId };
     } catch (error) {
-      throw new BadRequestException('Requisicao Invalida', error.message);
+      throw new BadRequestException(INVALID_REQUEST_MSG, error.message);
     }
   }
 
@@ -60,16 +62,12 @@ export class ProductsController {
   @ApiResponse({ status: 404, description: 'Produto nao encontrado' })
   async getProduct(@Param('id') prodId: number): Promise<ProductModel | null> {
     try {
-      const product = await this.productsService.getSingleProduct(prodId);
-      if (!product) {
-        throw new NotFoundException('Produto nao encontrado');
-      }
-      return product;
+      return await this.productsService.getSingleProduct(prodId);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new NotFoundException(error.message);
       } else {
-        throw new BadRequestException('Requisicao Invalida', error.message);
+        throw new BadRequestException(INVALID_REQUEST_MSG, error.message);
       }
     }
   }
@@ -95,7 +93,7 @@ export class ProductsController {
       if (error instanceof NotFoundException) {
         throw new NotFoundException(error.message);
       } else {
-        throw new BadRequestException('Requisição Invalida', error.message);
+        throw new BadRequestException(INVALID_REQUEST_MSG, error.message);
       }
     }
   }
@@ -109,7 +107,7 @@ export class ProductsController {
     try {
       await this.productsService.deleteProduct(prodId);
     } catch (error) {
-      throw new BadRequestException('Requisição Invalida', error.message);
+      throw new BadRequestException(INVALID_REQUEST_MSG, error.message);
     }
   }
 }
