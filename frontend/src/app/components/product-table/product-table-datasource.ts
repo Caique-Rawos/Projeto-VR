@@ -13,7 +13,6 @@ export interface ProductTableItem {
   price: number;
 }
 
-
 /**
  * Data source for the ProductTable view. This class should
  * encapsulate all logic for fetching and manipulating the displayed data

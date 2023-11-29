@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MatTable } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   ProductTableDataSource,
   ProductTableItem,
@@ -22,7 +23,7 @@ export class ProductTableComponent implements AfterViewInit {
   faTrashCan = faTrashCan;
   faPencil = faPencil;
 
-  constructor(private productService: ProductService) {}
+  constructor(private router: Router, private productService: ProductService) {}
 
   dataSource = new ProductTableDataSource(this.productService);
 
@@ -47,5 +48,9 @@ export class ProductTableComponent implements AfterViewInit {
         }
       );
     }
+  }
+
+  editarProduct(productId: number) {
+    this.router.navigate(['/cadastro', productId]);
   }
 }

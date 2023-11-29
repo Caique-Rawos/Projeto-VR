@@ -16,10 +16,16 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 import { ProductTableComponent } from './components/product-table/product-table.component';
 
 @NgModule({
-  declarations: [AppComponent, ViewProductComponent, RegisterProductComponent, ProductTableComponent],
+  declarations: [
+    AppComponent,
+    ViewProductComponent,
+    RegisterProductComponent,
+    ProductTableComponent,
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -33,6 +39,7 @@ import { ProductTableComponent } from './components/product-table/product-table.
     MatPaginatorModule,
     MatSortModule,
     HttpClientModule,
+    FormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

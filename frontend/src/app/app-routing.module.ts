@@ -6,6 +6,7 @@ import { RegisterProductComponent } from './components/register-product/register
 const routes: Routes = [
   { path: '', component: ViewProductComponent },
   { path: 'cadastro', component: RegisterProductComponent },
+  { path: 'cadastro/:id', component: RegisterProductComponent },
 ];
 
 @NgModule({
