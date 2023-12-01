@@ -10,11 +10,13 @@ import {
   HttpStatus,
   BadRequestException,
   NotFoundException,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBody,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -24,7 +26,7 @@ import { ProductModel } from './product.model';
 
 const INVALID_REQUEST_MSG: string = 'Requisicao Invalida';
 
-@ApiTags('products') // Adiciona uma tag à documentação Swagger
+@ApiTags('products')
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
@@ -45,7 +47,7 @@ export class ProductsController {
     }
   }
 
-  @Get()
+  @Get('all')
   @ApiOperation({ summary: 'Buscar todos os produtos cadastrados' })
   @ApiResponse({
     status: 200,
@@ -72,13 +74,28 @@ export class ProductsController {
     }
   }
 
+  @Get()
+  @ApiOperation({ summary: 'Obter produtos com filtros' })
+  @ApiQuery({ name: 'id', required: false, description: 'ID do produto' })
+  @ApiQuery({ name: 'desc', required: false, description: 'Descrição' })
+  @ApiQuery({ name: 'price', required: false, description: 'Preço de Custo' })
+  @ApiQuery({ name: 'sell', required: false, description: 'Preço de venda' })
+  async getProducts(
+    @Query('id') id: number,
+    @Query('desc') desc: string,
+    @Query('price') price: string,
+    @Query('sell') sell: string,
+  ) {
+    return this.productsService.getProductsDataTable(id, desc, price, sell);
+  }
+
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar produto cadastrado' })
   @ApiParam({ name: 'id', description: 'ID do produto' })
   @ApiBody({ type: ProductsDto })
   @ApiResponse({ status: 200, description: 'Produto atualizado com sucesso' })
   @ApiResponse({ status: 400, description: 'Solicitacao Invalida' })
-  @HttpCode(HttpStatus.NO_CONTENT) // Define o código de status HTTP sem corpo de resposta
+  @HttpCode(HttpStatus.NO_CONTENT)
   async updateProduct(
     @Param('id') prodId: number,
     @Body() productDto: ProductsDto,

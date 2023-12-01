@@ -7,7 +7,10 @@ import {
 import { Repository } from 'typeorm';
 import { ProductsEntity } from '../database/products.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { productsEntityMock } from '../__mocks__/products.mock';
+import {
+  listProductsEntityMock,
+  productsEntityMock,
+} from '../__mocks__/products.mock';
 import {
   createCorrectProductMock,
   createEmptyDescProductMock,
@@ -30,6 +33,14 @@ describe('ProductsService', () => {
             findOne: jest.fn().mockResolvedValue(productsEntityMock),
             find: jest.fn().mockResolvedValue(productsEntityMock),
             delete: jest.fn().mockResolvedValue(productsEntityMock),
+            createQueryBuilder: jest.fn(() => ({
+              select: jest.fn().mockReturnThis(),
+              from: jest.fn().mockReturnThis(),
+              where: jest.fn().mockReturnThis(),
+              andWhere: jest.fn().mockReturnThis(),
+              leftJoin: jest.fn().mockReturnThis(),
+              getRawMany: jest.fn().mockResolvedValue(listProductsEntityMock),
+            })),
           },
         },
       ],
@@ -130,6 +141,24 @@ describe('ProductsService', () => {
     await expect(
       service.getSingleProduct(productsEntityMock.id),
     ).rejects.toThrow();
+  });
+
+  /*
+    +---------------------+
+    |      DATA TABLE     |
+    +---------------------+
+  */
+
+  it('should return a list of all the products on getProductsDataTable', async () => {
+    const product = await service.getProductsDataTable(null, '', '', '');
+
+    expect(product).toEqual(listProductsEntityMock);
+  });
+
+  it('should return a list of all the products on getProductsDataTable', async () => {
+    const product = await service.getProductsDataTable(1.2, '', '', '');
+
+    expect(product).toEqual(listProductsEntityMock);
   });
 
   /*

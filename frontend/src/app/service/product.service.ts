@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ProductTableItem } from '../components/product-table/product-table-datasource';
+import { ProductData } from '../components/products-table/products-table.component';
 
 @Injectable({
   providedIn: 'root',
@@ -11,16 +11,21 @@ export class ProductService {
 
   private apiUrl = 'http://localhost:3000/products';
 
-  async getProducts(): Promise<ProductTableItem[]> {
+  async getProductsDataTable(
+    id: string,
+    desc: string,
+    price: string,
+    sell: string
+  ): Promise<ProductData[]> {
     try {
-      let data: ProductTableItem[] = []; // Inicializa como um array vazio
+      const params = { id: id, desc: desc, price: price, sell: sell };
+      let data: ProductData[] = [];
       const response = await this.http
-        .get<ProductTableItem[]>(this.apiUrl)
+        .get<ProductData[]>(this.apiUrl, { params: params })
         .toPromise();
 
       if (response !== undefined) {
         data = response;
-        console.log('Dados recebidos:', data);
       }
 
       return data;
