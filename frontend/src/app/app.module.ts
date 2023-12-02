@@ -26,6 +26,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ProductsTableComponent } from './components/products-table/products-table.component';
+import { OnlyNumberDirective } from './function/only-number.directive';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { ProductsTableComponent } from './components/products-table/products-tab
     ViewProductComponent,
     RegisterProductComponent,
     ProductsTableComponent,
+    OnlyNumberDirective,
   ],
   imports: [
     BrowserModule,

@@ -1,9 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import {
-  DESC_ERROR_MSG,
-  PRICE_ERROR_MSG,
-  ProductsService,
-} from '../products.service';
+import { ProductsService } from '../products.service';
 import { Repository } from 'typeorm';
 import { ProductsEntity } from '../database/products.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -17,15 +13,20 @@ import {
   createInvalidPriceProductMock,
 } from '../__mocks__/createProduct.mock';
 import { ProductModel } from '../product.model';
+import { ValidationService } from '../../validation/validation.service';
+import { DefaultMessagesService } from '../../default-messages/default-messages.service';
 
 describe('ProductsService', () => {
   let service: ProductsService;
+  let defaultMessages: DefaultMessagesService;
   let productRepository: Repository<ProductsEntity>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ProductsService,
+        ValidationService,
+        DefaultMessagesService,
         {
           provide: getRepositoryToken(ProductsEntity),
           useValue: {
@@ -47,6 +48,9 @@ describe('ProductsService', () => {
     }).compile();
 
     service = module.get<ProductsService>(ProductsService);
+    defaultMessages = module.get<DefaultMessagesService>(
+      DefaultMessagesService,
+    );
     productRepository = module.get<Repository<ProductsEntity>>(
       getRepositoryToken(ProductsEntity),
     );
@@ -54,6 +58,7 @@ describe('ProductsService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+    expect(defaultMessages).toBeDefined();
     expect(productRepository).toBeDefined();
   });
 
@@ -62,41 +67,42 @@ describe('ProductsService', () => {
     |       INSERTS       |
     +---------------------+
   */
-
-  it('should return a Product id on insertProduct', async () => {
-    const product = await service.insertProduct(
-      new ProductModel(
-        createCorrectProductMock.desc,
-        createCorrectProductMock.price,
-        '',
-      ),
-    );
-
-    expect(product).toEqual(productsEntityMock.id);
-  });
-
-  it('should return an error on insertProduct (desc)', async () => {
-    await expect(
-      service.insertProduct(
+  describe('Inserts', () => {
+    it('should return a Product id on insertProduct', async () => {
+      const product = await service.insertProduct(
         new ProductModel(
-          createEmptyDescProductMock.desc,
-          createEmptyDescProductMock.price,
+          createCorrectProductMock.desc,
+          createCorrectProductMock.price,
           '',
         ),
-      ),
-    ).rejects.toThrow(DESC_ERROR_MSG);
-  });
+      );
 
-  it('should return an error on insertProduct (price)', async () => {
-    await expect(
-      service.insertProduct(
-        new ProductModel(
-          createInvalidPriceProductMock.desc,
-          createInvalidPriceProductMock.price,
-          '',
+      expect(product).toEqual(productsEntityMock.id);
+    });
+
+    it('should return an error on insertProduct (desc)', async () => {
+      await expect(
+        service.insertProduct(
+          new ProductModel(
+            createEmptyDescProductMock.desc,
+            createEmptyDescProductMock.price,
+            '',
+          ),
         ),
-      ),
-    ).rejects.toThrow(PRICE_ERROR_MSG);
+      ).rejects.toThrow(defaultMessages.DESC_ERROR_MSG);
+    });
+
+    it('should return an error on insertProduct (price)', async () => {
+      await expect(
+        service.insertProduct(
+          new ProductModel(
+            createInvalidPriceProductMock.desc,
+            createInvalidPriceProductMock.price,
+            '',
+          ),
+        ),
+      ).rejects.toThrow(defaultMessages.PRICE_ERROR_MSG);
+    });
   });
 
   /*
@@ -104,11 +110,12 @@ describe('ProductsService', () => {
     |   GET ALL PRODUCT   |
     +---------------------+
   */
+  describe('Get All Product', () => {
+    it('should return a list of products on getProducts', async () => {
+      const product = await service.getProducts();
 
-  it('should return a list of products on getProducts', async () => {
-    const product = await service.getProducts();
-
-    expect(product).toEqual(productsEntityMock);
+      expect(product).toEqual(productsEntityMock);
+    });
   });
 
   /*
@@ -116,31 +123,34 @@ describe('ProductsService', () => {
     |  GET SINGLE PRODUCT  |
     +----------------------+
   */
+  describe('Get Single Product', () => {
+    it('should return a product in getSingleProduct', async () => {
+      const product = await service.getSingleProduct(productsEntityMock.id);
 
-  it('should return a product in getSingleProduct', async () => {
-    const product = await service.getSingleProduct(productsEntityMock.id);
+      expect(product).toEqual(productsEntityMock);
+    });
 
-    expect(product).toEqual(productsEntityMock);
-  });
+    it('should return an error in getSingleProduct (ID)', async () => {
+      await expect(service.getSingleProduct(1.3)).rejects.toThrow();
+    });
 
-  it('should return an error in getSingleProduct (ID)', async () => {
-    await expect(service.getSingleProduct(1.3)).rejects.toThrow();
-  });
+    it('should return an error in getSingleProduct (undefined)', async () => {
+      jest.spyOn(productRepository, 'findOne').mockResolvedValue(undefined);
 
-  it('should return an error in getSingleProduct (undefined)', async () => {
-    jest.spyOn(productRepository, 'findOne').mockResolvedValue(undefined);
+      await expect(
+        service.getSingleProduct(productsEntityMock.id),
+      ).rejects.toThrow();
+    });
 
-    await expect(
-      service.getSingleProduct(productsEntityMock.id),
-    ).rejects.toThrow();
-  });
+    it('should return an error in getSingleProduct (Error BD)', async () => {
+      jest
+        .spyOn(productRepository, 'findOne')
+        .mockRejectedValueOnce(new Error());
 
-  it('should return an error in getSingleProduct (Error BD)', async () => {
-    jest.spyOn(productRepository, 'findOne').mockRejectedValueOnce(new Error());
-
-    await expect(
-      service.getSingleProduct(productsEntityMock.id),
-    ).rejects.toThrow();
+      await expect(
+        service.getSingleProduct(productsEntityMock.id),
+      ).rejects.toThrow();
+    });
   });
 
   /*
@@ -148,17 +158,18 @@ describe('ProductsService', () => {
     |      DATA TABLE     |
     +---------------------+
   */
+  describe('Data Table', () => {
+    it('should return a list of all the products on getProductsDataTable', async () => {
+      const product = await service.getProductsDataTable(null, '', '', '');
 
-  it('should return a list of all the products on getProductsDataTable', async () => {
-    const product = await service.getProductsDataTable(null, '', '', '');
+      expect(product).toEqual(listProductsEntityMock);
+    });
 
-    expect(product).toEqual(listProductsEntityMock);
-  });
+    it('should return a empty list on getProductsDataTable', async () => {
+      const product = await service.getProductsDataTable(1.2, '', '', '');
 
-  it('should return a list of all the products on getProductsDataTable', async () => {
-    const product = await service.getProductsDataTable(1.2, '', '', '');
-
-    expect(product).toEqual(listProductsEntityMock);
+      expect(product).toEqual([]);
+    });
   });
 
   /*
@@ -166,45 +177,46 @@ describe('ProductsService', () => {
     |       UPDATES       |
     +---------------------+
   */
-
-  it('should return nothing on updateProduct', async () => {
-    const product = await service.updateProduct(
-      productsEntityMock.id,
-      'Teste Atualiza',
-      149.95,
-    );
-
-    expect(product).toEqual(undefined);
-  });
-
-  it('should return an error in updateProduct (ID)', async () => {
-    await expect(
-      service.updateProduct(
-        1.3,
-        productsEntityMock.desc,
-        productsEntityMock.price,
-      ),
-    ).rejects.toThrow();
-  });
-
-  it('should return an error on updateProduct (desc)', async () => {
-    await expect(
-      service.updateProduct(
+  describe('Updates', () => {
+    it('should return nothing on updateProduct', async () => {
+      const product = await service.updateProduct(
         productsEntityMock.id,
-        createEmptyDescProductMock.desc,
-        productsEntityMock.price,
-      ),
-    ).rejects.toThrow(DESC_ERROR_MSG);
-  });
+        'Teste Atualiza',
+        149.95,
+      );
 
-  it('should return an error on updateProduct (price)', async () => {
-    await expect(
-      service.updateProduct(
-        productsEntityMock.id,
-        productsEntityMock.desc,
-        createInvalidPriceProductMock.price,
-      ),
-    ).rejects.toThrow(PRICE_ERROR_MSG);
+      expect(product).toEqual(undefined);
+    });
+
+    it('should return an error in updateProduct (ID)', async () => {
+      await expect(
+        service.updateProduct(
+          1.3,
+          productsEntityMock.desc,
+          productsEntityMock.price,
+        ),
+      ).rejects.toThrow();
+    });
+
+    it('should return an error on updateProduct (desc)', async () => {
+      await expect(
+        service.updateProduct(
+          productsEntityMock.id,
+          createEmptyDescProductMock.desc,
+          productsEntityMock.price,
+        ),
+      ).rejects.toThrow(defaultMessages.DESC_ERROR_MSG);
+    });
+
+    it('should return an error on updateProduct (price)', async () => {
+      await expect(
+        service.updateProduct(
+          productsEntityMock.id,
+          productsEntityMock.desc,
+          createInvalidPriceProductMock.price,
+        ),
+      ).rejects.toThrow(defaultMessages.PRICE_ERROR_MSG);
+    });
   });
 
   /*
@@ -212,142 +224,15 @@ describe('ProductsService', () => {
     |       DELETES       |
     +---------------------+
   */
+  describe('Deletes', () => {
+    it('should return an error in deleteProduct (ID)', async () => {
+      await expect(service.deleteProduct(1.3)).rejects.toThrow();
+    });
 
-  it('should return an error in deleteProduct (ID)', async () => {
-    await expect(service.deleteProduct(1.3)).rejects.toThrow();
-  });
+    it('should return nothing on deleteProduct', async () => {
+      const product = await service.deleteProduct(productsEntityMock.id);
 
-  it('should return nothing on deleteProduct', async () => {
-    const product = await service.deleteProduct(productsEntityMock.id);
-
-    expect(product).toEqual(undefined);
-  });
-
-  /*
-    +---------------------+
-    |      VALID IDS      |
-    +---------------------+
-  */
-
-  it('should return true on isValidId (mock id)', async () => {
-    const bool = await service.isValidId(productsEntityMock.id);
-
-    expect(bool).toEqual(true);
-  });
-
-  it('should return false on isValidId (1.3)', async () => {
-    const bool = await service.isValidId(1.3);
-
-    expect(bool).toEqual(false);
-  });
-
-  it('should return false on isValidId (undefined)', async () => {
-    const bool = await service.isValidId(undefined);
-
-    expect(bool).toEqual(false);
-  });
-
-  /*
-    +---------------------+
-    |     VALID PRICE     |
-    +---------------------+
-  */
-
-  it('should return true on isValidPrice (mock price)', async () => {
-    const bool = await service.isValidPrice(productsEntityMock.price);
-
-    expect(bool).toEqual(true);
-  });
-
-  it('should return true on isValidPrice (0.001)', async () => {
-    const bool = await service.isValidPrice(0.001);
-
-    expect(bool).toEqual(true);
-  });
-
-  it('should return true on isValidPrice (1234567890.999)', async () => {
-    const bool = await service.isValidPrice(1234567890.999);
-
-    expect(bool).toEqual(true);
-  });
-
-  it('should return false on isValidPrice (mock invalid price)', async () => {
-    const bool = await service.isValidPrice(
-      createInvalidPriceProductMock.price,
-    );
-
-    expect(bool).toEqual(false);
-  });
-
-  it('should return false on isValidPrice (0.0009)', async () => {
-    const bool = await service.isValidPrice(0.0009);
-
-    expect(bool).toEqual(false);
-  });
-
-  it('should return false on isValidPrice (12345678901)', async () => {
-    const bool = await service.isValidPrice(12345678901);
-
-    expect(bool).toEqual(false);
-  });
-
-  it('should return false on isValidPrice (1234567890.5426)', async () => {
-    const bool = await service.isValidPrice(1234567890.5426);
-
-    expect(bool).toEqual(false);
-  });
-
-  it('should return false on isValidPrice (undefined)', async () => {
-    const bool = await service.isValidPrice(undefined);
-
-    expect(bool).toEqual(false);
-  });
-
-  /*
-    +----------------------+
-    |      VALID DESC      |
-    +----------------------+
-  */
-
-  it('should return true on isValidDesc (mock desc)', async () => {
-    const bool = await service.isValidDesc(productsEntityMock.desc);
-
-    expect(bool).toEqual(true);
-  });
-
-  it('should return true on isValidDesc (test)', async () => {
-    const bool = await service.isValidDesc('test');
-
-    expect(bool).toEqual(true);
-  });
-
-  it('should return true on isValidDesc (t)', async () => {
-    const bool = await service.isValidDesc('t');
-
-    expect(bool).toEqual(true);
-  });
-
-  it('should return false on isValidDesc (empty mock)', async () => {
-    const bool = await service.isValidDesc(createEmptyDescProductMock.desc);
-
-    expect(bool).toEqual(false);
-  });
-
-  it('should return false on isValidDesc (empty string)', async () => {
-    const bool = await service.isValidDesc('');
-
-    expect(bool).toEqual(false);
-  });
-
-  it('should return false on isValidDesc (spaces)', async () => {
-    const bool = await service.isValidDesc('   ');
-
-    expect(bool).toEqual(false);
-  });
-
-  it('should return false on isValidDesc (undefined)', async () => {
-    const bool = await service.isValidDesc(undefined);
-
-    expect(bool).toEqual(false);
+      expect(product).toEqual(undefined);
+    });
   });
 });

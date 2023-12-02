@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { ProductService } from 'src/app/service/product.service';
+import { ProductService } from '../../../app/service/product.service';
 import { faTrashCan, faPencil } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 

@@ -18,20 +18,23 @@ export class ProductService {
     sell: string
   ): Promise<ProductData[]> {
     try {
-      const params = { id: id, desc: desc, price: price, sell: sell };
-      let data: ProductData[] = [];
-      const response = await this.http
-        .get<ProductData[]>(this.apiUrl, { params: params })
-        .toPromise();
+      if (!Number.isInteger(Number(id)) || id.includes('.')) {
+        return [];
+      } else {
+        const params = { id: id, desc: desc, price: price, sell: sell };
+        let data: ProductData[] = [];
+        const response = await this.http
+          .get<ProductData[]>(this.apiUrl, { params: params })
+          .toPromise();
 
-      if (response !== undefined) {
-        data = response;
+        if (response !== undefined) {
+          data = response;
+        }
+
+        return data;
       }
-
-      return data;
     } catch (error) {
-      console.error('Erro ao obter dados:', error);
-      throw error;
+      return [];
     }
   }
 

@@ -23,13 +23,15 @@ import {
 import { ProductsService } from './products.service';
 import { ProductsDto } from './dtos/products.dto';
 import { ProductModel } from './product.model';
-
-const INVALID_REQUEST_MSG: string = 'Requisicao Invalida';
+import { DefaultMessagesService } from 'src/default-messages/default-messages.service';
 
 @ApiTags('products')
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(
+    private readonly productsService: ProductsService,
+    private readonly defaultMessagesService: DefaultMessagesService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Criar um novo produto' })
@@ -43,7 +45,10 @@ export class ProductsController {
       );
       return { id: generatedId };
     } catch (error) {
-      throw new BadRequestException(INVALID_REQUEST_MSG, error.message);
+      throw new BadRequestException(
+        this.defaultMessagesService.INVALID_REQUEST_MSG,
+        error.message,
+      );
     }
   }
 
@@ -69,7 +74,10 @@ export class ProductsController {
       if (error instanceof NotFoundException) {
         throw new NotFoundException(error.message);
       } else {
-        throw new BadRequestException(INVALID_REQUEST_MSG, error.message);
+        throw new BadRequestException(
+          this.defaultMessagesService.INVALID_REQUEST_MSG,
+          error.message,
+        );
       }
     }
   }
@@ -110,7 +118,10 @@ export class ProductsController {
       if (error instanceof NotFoundException) {
         throw new NotFoundException(error.message);
       } else {
-        throw new BadRequestException(INVALID_REQUEST_MSG, error.message);
+        throw new BadRequestException(
+          this.defaultMessagesService.INVALID_REQUEST_MSG,
+          error.message,
+        );
       }
     }
   }
@@ -124,7 +135,10 @@ export class ProductsController {
     try {
       await this.productsService.deleteProduct(prodId);
     } catch (error) {
-      throw new BadRequestException(INVALID_REQUEST_MSG, error.message);
+      throw new BadRequestException(
+        this.defaultMessagesService.INVALID_REQUEST_MSG,
+        error.message,
+      );
     }
   }
 }

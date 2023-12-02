@@ -1,8 +1,18 @@
-.text-center {
-  margin-left: 35%;
+.mat-toolbar-color-purple {
+  background-color: #d45a22;
+  color: white;
 }
 
-.mat-toolbar-color-purple {
-  background-color: #570d57;
-  color: white;
+.center-text {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.icons {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+fa-icon {
+  font-size: 25px;
 }

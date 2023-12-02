@@ -1,15 +1,16 @@
 <mat-toolbar class="mat-toolbar-color-purple">
   <mat-toolbar-row>
-    <button routerLink="cadastro" mat-button>
-      <fa-icon [icon]="faPlusCircle" style="font-size: 25px"></fa-icon>
-    </button>
-    <span class="text-center">Consulta de Produtos</span>
-    <div></div>
+    <div class="icons">
+      <button routerLink="cadastro" mat-button>
+        <fa-icon [icon]="faPlusCircle"></fa-icon>
+      </button>
+    </div>
+    <span class="center-text">Consulta de Produtos</span>
   </mat-toolbar-row>
 </mat-toolbar>
 
 <br />
 
-<div class="container">
+<div>
   <app-products-table></app-products-table>
 </div>

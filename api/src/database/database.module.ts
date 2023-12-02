@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProductsEntity } from 'src/products/database/products.entity';
+import { ProductStoreEntity } from '../product-store/database/productStore.entity';
+import { ProductsEntity } from '../products/database/products.entity';
+import { StoreEntity } from '../store/database/store.entity';
 
 @Module({
   imports: [
@@ -10,7 +12,7 @@ import { ProductsEntity } from 'src/products/database/products.entity';
       username: 'postgres',
       password: 'postgres',
       database: 'postgres',
-      entities: [ProductsEntity],
+      entities: [ProductsEntity, ProductStoreEntity, StoreEntity],
       synchronize: true,
     }),
   ],
