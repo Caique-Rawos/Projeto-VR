@@ -7,4 +7,6 @@ export class DefaultMessagesService {
   DESC_ERROR_MSG: string = 'Descricao eh obrigatoria';
   NOT_FOUND_ERROR_MSG: string = 'Produto nao encontrado';
   INVALID_REQUEST_MSG: string = 'Requisicao Invalida';
+  PRODUCT_STORE_DUPLICITY_MSG: string =
+    'Duplicidade de valor em produto e loja';
 }

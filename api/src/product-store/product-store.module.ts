@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ProductStoreService } from './product-store.service';
 import { ProductStoreController } from './product-store.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProductStoreEntity } from './database/productStore.entity';
+import { ProductStoreEntity } from '../database/entities/productStore.entity';
 import { ValidationService } from '../validation/validation.service';
 import { DefaultMessagesService } from '../default-messages/default-messages.service';
 

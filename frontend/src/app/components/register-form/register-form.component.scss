@@ -37,3 +37,12 @@ fa-icon.gray {
   font-size: 25px;
   color: gray;
 }
+
+@media screen and (max-width: 600px) {
+  .mat-grid-tile {
+    grid-column: span 3 !important;
+  }
+  mat-form-field {
+    width: 100% !important;
+  }
+}

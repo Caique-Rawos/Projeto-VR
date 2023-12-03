@@ -22,7 +22,7 @@ import {
 } from '@nestjs/swagger';
 import { ProductsService } from './products.service';
 import { ProductsDto } from './dtos/products.dto';
-import { ProductModel } from './product.model';
+import { ProductModel } from './products.model';
 import { DefaultMessagesService } from '../default-messages/default-messages.service';
 
 @ApiTags('products')
@@ -113,6 +113,7 @@ export class ProductsController {
         prodId,
         productDto.desc,
         productDto.price,
+        productDto.image,
       );
     } catch (error) {
       if (error instanceof NotFoundException) {

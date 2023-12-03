@@ -61,13 +61,40 @@ export class SellPriceDialogComponent implements AfterViewInit {
       ) {
         if (this.data && this.data.idProd != undefined) {
           if (this.action == 1) {
-            //TODO: validar se o produtoLoja ja existe antes de inseri-lo
-            const products = await this.productService.addProductStore({
-              sell: this.inputSellPrice,
-              idProduct: this.data.idProd,
-              idStore: this.selectIdStore,
-            });
-            if (products != undefined) {
+            const searchDuplicity = await this.productService.findProductStore(
+              this.data.idProd,
+              this.selectIdStore
+            );
+
+            if (searchDuplicity == null) {
+              const products = await this.productService.addProductStore({
+                sell: this.inputSellPrice,
+                idProduct: this.data.idProd,
+                idStore: this.selectIdStore,
+              });
+              if (products != undefined) {
+                window.location.reload();
+              } else {
+                this.toastr.error(
+                  'Um ou mais campos obrigatórios não foram preenchidos corretamente.',
+                  'Valores invalidos'
+                );
+              }
+            } else {
+              this.toastr.error(
+                'Não é permitido mais que um preço de venda para a mesma loja.',
+                'Valor para Loja já existente.'
+              );
+            }
+          } else if (this.action == 2) {
+            const products = await this.productService.updateProductStore(
+              this.data.idSellPrice,
+              {
+                sell: this.inputSellPrice,
+              }
+            );
+
+            if (products == null) {
               window.location.reload();
             } else {
               this.toastr.error(
@@ -75,8 +102,6 @@ export class SellPriceDialogComponent implements AfterViewInit {
                 'Valores invalidos'
               );
             }
-          } else if (this.action == 2) {
-            alert('update não concluido ainda');
           } else {
             console.log('Erro, não foi possivel identificar a ação desejada!');
           }

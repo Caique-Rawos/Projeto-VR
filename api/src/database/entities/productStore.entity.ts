@@ -1,5 +1,5 @@
-import { StoreEntity } from '../../store/database/store.entity';
-import { ProductsEntity } from '../../products/database/products.entity';
+import { StoreEntity } from './store.entity';
+import { ProductsEntity } from './products.entity';
 import {
   Column,
   Entity,
@@ -27,14 +27,14 @@ export class ProductStoreEntity {
     type: 'int',
     nullable: false,
   })
-  idproduto: number;
+  idProduct: number;
 
   @Column({
     name: 'idloja',
     type: 'int',
     nullable: false,
   })
-  idloja: number;
+  idStore: number;
 
   @ManyToOne(() => ProductsEntity, (product) => product.productStores, {
     onDelete: 'CASCADE',
@@ -48,9 +48,9 @@ export class ProductStoreEntity {
   @JoinColumn({ name: 'idloja' })
   store: StoreEntity;
 
-  constructor(sell: number, idproduto: number, idloja: number) {
+  constructor(sell: number, idproduct: number, idStore: number) {
     this.sell = sell;
-    this.idproduto = idproduto;
-    this.idloja = idloja;
+    this.idProduct = idproduct;
+    this.idStore = idStore;
   }
 }

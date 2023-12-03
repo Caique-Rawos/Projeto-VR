@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ProductsService } from '../products.service';
-import { Repository } from 'typeorm';
-import { ProductsEntity } from '../database/products.entity';
+import { ProductsService } from '../products/products.service';
+import { Repository, SelectQueryBuilder } from 'typeorm';
+import { ProductsEntity } from '../database/entities/products.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import {
   listProductsEntityMock,
@@ -12,9 +12,10 @@ import {
   createEmptyDescProductMock,
   createInvalidPriceProductMock,
 } from '../__mocks__/createProduct.mock';
-import { ProductModel } from '../product.model';
-import { ValidationService } from '../../validation/validation.service';
-import { DefaultMessagesService } from '../../default-messages/default-messages.service';
+import { ProductModel } from '../products/products.model';
+import { ValidationService } from '../validation/validation.service';
+import { DefaultMessagesService } from '../default-messages/default-messages.service';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('ProductsService', () => {
   let service: ProductsService;
@@ -41,6 +42,7 @@ describe('ProductsService', () => {
               andWhere: jest.fn().mockReturnThis(),
               leftJoin: jest.fn().mockReturnThis(),
               getRawMany: jest.fn().mockResolvedValue(listProductsEntityMock),
+              getRawOne: jest.fn().mockResolvedValue(productsEntityMock),
             })),
           },
         },
@@ -121,35 +123,42 @@ describe('ProductsService', () => {
   /*
     +----------------------+
     |  GET SINGLE PRODUCT  |
-    +----------------------+
+    +----------------------+ 
   */
   describe('Get Single Product', () => {
     it('should return a product in getSingleProduct', async () => {
       const product = await service.getSingleProduct(productsEntityMock.id);
-
       expect(product).toEqual(productsEntityMock);
     });
 
     it('should return an error in getSingleProduct (ID)', async () => {
-      await expect(service.getSingleProduct(1.3)).rejects.toThrow();
+      await expect(service.getSingleProduct(1.3)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should return an error in getSingleProduct (undefined)', async () => {
-      jest.spyOn(productRepository, 'findOne').mockResolvedValue(undefined);
-
-      await expect(
-        service.getSingleProduct(productsEntityMock.id),
-      ).rejects.toThrow();
+      await expect(service.getSingleProduct(undefined)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should return an error in getSingleProduct (Error BD)', async () => {
+      const mockSelectQueryBuilder: Partial<
+        SelectQueryBuilder<ProductsEntity>
+      > = {
+        select: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        getRawOne: jest.fn().mockRejectedValueOnce(new Error()),
+      };
+
       jest
-        .spyOn(productRepository, 'findOne')
-        .mockRejectedValueOnce(new Error());
+        .spyOn(productRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockSelectQueryBuilder as any);
 
       await expect(
-        service.getSingleProduct(productsEntityMock.id),
-      ).rejects.toThrow();
+        async () => await service.getSingleProduct(productsEntityMock.id),
+      ).rejects.toThrowError(new Error());
     });
   });
 
@@ -183,6 +192,7 @@ describe('ProductsService', () => {
         productsEntityMock.id,
         'Teste Atualiza',
         149.95,
+        null,
       );
 
       expect(product).toEqual(undefined);
@@ -194,6 +204,7 @@ describe('ProductsService', () => {
           1.3,
           productsEntityMock.desc,
           productsEntityMock.price,
+          productsEntityMock.image,
         ),
       ).rejects.toThrow();
     });
@@ -204,6 +215,7 @@ describe('ProductsService', () => {
           productsEntityMock.id,
           createEmptyDescProductMock.desc,
           productsEntityMock.price,
+          productsEntityMock.image,
         ),
       ).rejects.toThrow(defaultMessages.DESC_ERROR_MSG);
     });
@@ -214,6 +226,7 @@ describe('ProductsService', () => {
           productsEntityMock.id,
           productsEntityMock.desc,
           createInvalidPriceProductMock.price,
+          productsEntityMock.image,
         ),
       ).rejects.toThrow(defaultMessages.PRICE_ERROR_MSG);
     });

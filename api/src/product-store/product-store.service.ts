@@ -1,10 +1,15 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { ProductStoreEntity } from './database/productStore.entity';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { ProductStoreEntity } from '../database/entities/productStore.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ValidationService } from '../validation/validation.service';
 import { DefaultMessagesService } from '../default-messages/default-messages.service';
-import { ProductStoreModal } from './product-store.model';
+import { ProductStoreModel } from './product-store.model';
+import { Console } from 'console';
 
 @Injectable()
 export class ProductStoreService {
@@ -21,7 +26,7 @@ export class ProductStoreService {
    * @returns id do produto criado
    */
   async insertProductStore(
-    productStoreModel: ProductStoreModal,
+    productStoreModel: ProductStoreModel,
   ): Promise<number> {
     const { sell, idProduct, idStore } = productStoreModel;
 
@@ -43,6 +48,12 @@ export class ProductStoreService {
 
     if (!this.validationService.isValidId(idStore)) {
       throw new BadRequestException(this.defaultMessagesService.ID_ERROR_MSG);
+    }
+
+    if ((await this.getProductSellDuplicity(idProduct, idStore)) != null) {
+      throw new BadRequestException(
+        this.defaultMessagesService.PRODUCT_STORE_DUPLICITY_MSG,
+      );
     }
 
     const newProduct = new ProductStoreEntity(sell, idProduct, idStore);
@@ -89,6 +100,71 @@ export class ProductStoreService {
     } else {
       return [];
     }
+  }
+
+  /**
+   * Verica se o preço de um produto ja existe em uma loja
+   * @param idProduct id do produto
+   * @param idStore id da loja
+   * @returns produtoLoja
+   */
+  async getProductSellDuplicity(idProduct: number, idStore: number) {
+    if (
+      this.validationService.isValidId(idProduct) &&
+      this.validationService.isValidId(idStore)
+    ) {
+      return await this.productStoreRepository
+        .createQueryBuilder('produtoloja')
+        .select('*')
+        .where('idproduto = :idProduct', { idProduct: idProduct })
+        .andWhere('idloja = :idStore', { idStore: idStore })
+        .getRawOne();
+    } else {
+      throw new BadRequestException(this.defaultMessagesService.ID_ERROR_MSG);
+    }
+  }
+
+  /**
+   * Retorna um produtoLoja baseado no Id informado
+   * @param prodStoreId id do produtoLoja desejado
+   * @returns um produtoloja
+   */
+  async getSingleProductStore(
+    prodStoreId: number,
+  ): Promise<ProductStoreEntity> {
+    if (!this.validationService.isValidId(prodStoreId)) {
+      throw new BadRequestException(this.defaultMessagesService.ID_ERROR_MSG);
+    }
+    const product = await this.productStoreRepository.findOne({
+      where: { id: prodStoreId },
+    });
+
+    if (!product) {
+      throw new NotFoundException(
+        this.defaultMessagesService.NOT_FOUND_ERROR_MSG,
+      );
+    }
+
+    return product;
+  }
+
+  /**
+   * Atualiza o produtoLoja
+   * @param prodStoreId id do produtoLoja
+   * @param sell preço de venda
+   */
+  async updateProductStore(prodStoreId: number, sell: number): Promise<void> {
+    if (!this.validationService.isValidPrice(sell)) {
+      throw new BadRequestException(
+        this.defaultMessagesService.PRICE_ERROR_MSG,
+      );
+    }
+
+    const productToUpdate = await this.getSingleProductStore(prodStoreId);
+
+    productToUpdate.sell = sell;
+
+    await this.productStoreRepository.save(productToUpdate);
   }
 
   /**

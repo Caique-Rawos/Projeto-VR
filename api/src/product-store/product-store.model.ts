@@ -1,4 +1,4 @@
-export class ProductStoreModal {
+export class ProductStoreModel {
   constructor(
     public sell: number,
     public idProduct: number,

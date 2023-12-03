@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DefaultMessagesService } from './default-messages.service';
+import { DefaultMessagesService } from '../default-messages/default-messages.service';
 
 describe('DefaultMessagesService', () => {
   let service: DefaultMessagesService;
@@ -34,5 +34,11 @@ describe('DefaultMessagesService', () => {
 
   it('should be "Requisicao Invalida"', () => {
     expect(service.INVALID_REQUEST_MSG).toEqual('Requisicao Invalida');
+  });
+
+  it('should be "Duplicidade de valor em produto e loja"', () => {
+    expect(service.PRODUCT_STORE_DUPLICITY_MSG).toEqual(
+      'Duplicidade de valor em produto e loja',
+    );
   });
 });

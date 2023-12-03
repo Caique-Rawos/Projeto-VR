@@ -2,10 +2,7 @@ export interface ProductData {
   id: number;
   desc: string;
   price: string;
-  image: {
-    type: string;
-    data: number[];
-  };
+  image: string;
 }
 
 export interface StoreData {

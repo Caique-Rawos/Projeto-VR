@@ -1,4 +1,10 @@
-import { AfterViewInit, Component, Input, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  HostListener,
+  Input,
+  ViewChild,
+} from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import {
@@ -25,6 +31,10 @@ export class RegisterFormComponent implements AfterViewInit {
 
   @Input() productId!: string | null;
 
+  responsivoColspan1: number = 1;
+  responsivoColspan2: number = 2;
+  responsivoRowSpan: number = 1;
+
   constructor(
     private productService: ProductService,
     private router: Router,
@@ -45,7 +55,13 @@ export class RegisterFormComponent implements AfterViewInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any): void {
+    this.atualizarColspan();
+  }
+
   async ngOnInit() {
+    this.atualizarColspan();
     if (this.productId != null) {
       try {
         const products = await this.productService.getProductsById(
@@ -55,9 +71,9 @@ export class RegisterFormComponent implements AfterViewInit {
           this.inputId = products.id;
           this.inputDesc = products.desc;
           this.inputPrice = parseFloat(products.price).toFixed(2);
-          this.url =
-            'data:image/jpeg;base64,' +
-            this.bytesBufferToBase64(products.image);
+          if (products.image != null) {
+            this.url = 'data:image/jpeg;base64,' + products.image;
+          }
 
           this.action = 2; //define que será uma atualização
         } else {
@@ -73,17 +89,6 @@ export class RegisterFormComponent implements AfterViewInit {
     this.dataSource = new MatTableDataSource(products);
 
     this.dataSource.paginator = this.paginator;
-  }
-
-  bytesBufferToBase64(buffer: any) {
-    let binary = '';
-    const bytes = new Uint8Array(buffer);
-    const len = bytes.byteLength;
-    for (let i = 0; i < len; i += 1) {
-      binary += String.fromCharCode(bytes[i]);
-    }
-
-    return btoa(binary);
   }
 
   ngAfterViewInit() {
@@ -136,11 +141,6 @@ export class RegisterFormComponent implements AfterViewInit {
         if (result != undefined) {
           const productId = result.id;
           this.router.navigate(['/cadastro', productId]);
-        } else {
-          this.toastr.error(
-            'Um ou mais campos obrigatórios não foram preenchidos corretamente.',
-            'Erro ao cadastrar produto'
-          );
         }
       } else if (this.action == 2) {
         if (this.inputId != undefined) {
@@ -217,5 +217,13 @@ export class RegisterFormComponent implements AfterViewInit {
     }
 
     return true;
+  }
+
+  private atualizarColspan(): void {
+    const larguraLimite = 600;
+    const larguraTela = window.innerWidth;
+    this.responsivoColspan1 = larguraTela < larguraLimite ? 3 : 1;
+    this.responsivoColspan2 = larguraTela < larguraLimite ? 3 : 2;
+    this.responsivoRowSpan = larguraTela < larguraLimite ? 3 : 1;
   }
 }

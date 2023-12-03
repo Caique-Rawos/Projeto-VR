@@ -1,4 +1,4 @@
-import { ProductsDto } from '../dtos/products.dto';
+import { ProductsDto } from '../products/dtos/products.dto';
 
 export const createCorrectProductMock: ProductsDto = {
   desc: 'Produto Teste',

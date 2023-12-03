@@ -3,9 +3,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ProductModel } from './product.model';
+import { ProductModel } from './products.model';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ProductsEntity } from './database/products.entity';
+import { ProductsEntity } from '../database/entities/products.entity';
 import { Repository } from 'typeorm';
 import { ValidationService } from '../validation/validation.service';
 import { DefaultMessagesService } from '../default-messages/default-messages.service';
@@ -67,9 +67,16 @@ export class ProductsService {
     if (!this.validationService.isValidId(prodId)) {
       throw new BadRequestException(this.defaultMessagesService.ID_ERROR_MSG);
     }
-    const product = await this.productRepository.findOne({
-      where: { id: prodId },
-    });
+    const product = await this.productRepository
+      .createQueryBuilder('produto')
+      .select([
+        'produto.id as id',
+        'produto.descricao as desc',
+        'produto.custo as price',
+        "encode(produto.imagem, 'escape') as image",
+      ])
+      .where('produto.id = :id', { id: prodId })
+      .getRawOne();
 
     if (!product) {
       throw new NotFoundException(
@@ -140,6 +147,7 @@ export class ProductsService {
     productId: number,
     desc: string,
     price: number,
+    image: string | null,
   ): Promise<void> {
     if (!this.validationService.isValidId(productId)) {
       throw new BadRequestException(this.defaultMessagesService.ID_ERROR_MSG);
@@ -159,6 +167,9 @@ export class ProductsService {
 
     productToUpdate.desc = desc;
     productToUpdate.price = price;
+    if (image != null) {
+      productToUpdate.image = image;
+    }
 
     await this.productRepository.save(productToUpdate);
   }

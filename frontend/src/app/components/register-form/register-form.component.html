@@ -1,6 +1,6 @@
 <div class="container">
   <mat-grid-list cols="3" rowHeight="100px">
-    <mat-grid-tile rowspan="1" [colspan]="2">
+    <mat-grid-tile [rowspan]="responsivoRowSpan" [colspan]="responsivoColspan2">
       <div style="width: 100%">
         <mat-card>
           <mat-card-content>
@@ -41,11 +41,11 @@
       </div>
     </mat-grid-tile>
 
-    <mat-grid-tile rowspan="5" [colspan]="1">
-      <div>
+    <mat-grid-tile rowspan="5" [colspan]="responsivoColspan1" id="responsivo">
+      <div style="min-height: 250px; width: 100%; max-width: 250px">
         <label for="inputImage">Imagem</label>
         <div style="min-height: 250px">
-          <img [src]="url" height="250px" width="100%" />
+          <img [src]="url" width="100%" />
         </div>
 
         <br />
@@ -53,13 +53,14 @@
         <input
           id="inputImage"
           type="file"
+          style="text-align: center"
           accept=".png, .jpg"
           (change)="onSelectFile($event)"
         />
       </div>
     </mat-grid-tile>
 
-    <mat-grid-tile rowspan="4" [colspan]="2">
+    <mat-grid-tile rowspan="4" [colspan]="responsivoColspan2">
       <div class="mat-elevation-z8" style="width: 100%">
         <table mat-table [dataSource]="dataSource">
           <ng-container matColumnDef="addprice">
