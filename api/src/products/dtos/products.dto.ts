@@ -6,4 +6,7 @@ export class ProductsDto {
 
   @ApiProperty()
   public price: number;
+
+  @ApiProperty({ type: 'string', format: 'binary' })
+  public image: string;
 }

@@ -25,7 +25,7 @@ export class ProductsService {
    * @returns id do produto criado
    */
   async insertProduct(productModel: ProductModel): Promise<number> {
-    const { desc, price } = productModel;
+    const { desc, price, image } = productModel;
 
     if (
       !(
@@ -43,7 +43,7 @@ export class ProductsService {
       throw new BadRequestException(this.defaultMessagesService.DESC_ERROR_MSG);
     }
 
-    const newProduct = new ProductsEntity(desc, price);
+    const newProduct = new ProductsEntity(desc, price, image);
 
     const savedProduct = await this.productRepository.save(newProduct);
 
@@ -99,7 +99,7 @@ export class ProductsService {
       .select([
         'distinct on (produto.id) produto.id as id',
         'produto.descricao as desc',
-        'ROUND(produto.custo, 2) as price',
+        'ROUND(COALESCE(produto.custo, 0), 2) as price',
       ])
       .leftJoin('produtoloja', 'p2', 'produto.id = p2.idproduto');
 

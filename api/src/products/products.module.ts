@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductsEntity } from './database/products.entity';
 import { ValidationService } from '../validation/validation.service';
 import { DefaultMessagesService } from '../default-messages/default-messages.service';
-import { ProductStoreService } from 'src/product-store/product-store.service';
+import { ProductStoreService } from '../product-store/product-store.service';
 import { Repository } from 'typeorm';
 
 @Module({

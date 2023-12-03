@@ -73,7 +73,7 @@ describe('ProductsService', () => {
         new ProductModel(
           createCorrectProductMock.desc,
           createCorrectProductMock.price,
-          '',
+          createCorrectProductMock.image,
         ),
       );
 
@@ -86,7 +86,7 @@ describe('ProductsService', () => {
           new ProductModel(
             createEmptyDescProductMock.desc,
             createEmptyDescProductMock.price,
-            '',
+            createEmptyDescProductMock.image,
           ),
         ),
       ).rejects.toThrow(defaultMessages.DESC_ERROR_MSG);
@@ -98,7 +98,7 @@ describe('ProductsService', () => {
           new ProductModel(
             createInvalidPriceProductMock.desc,
             createInvalidPriceProductMock.price,
-            '',
+            createInvalidPriceProductMock.image,
           ),
         ),
       ).rejects.toThrow(defaultMessages.PRICE_ERROR_MSG);

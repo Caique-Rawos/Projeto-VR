@@ -26,8 +26,9 @@ export class ProductsEntity {
   })
   productStores?: ProductStoreEntity[];
 
-  constructor(desc: string, price: number) {
+  constructor(desc: string, price: number, image: string) {
     this.desc = desc;
     this.price = price;
+    this.image = image;
   }
 }

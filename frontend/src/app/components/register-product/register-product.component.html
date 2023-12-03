@@ -1,12 +1,16 @@
 <mat-toolbar class="mat-toolbar-color-purple">
   <mat-toolbar-row>
-    <button mat-button class="icons">
+    <button mat-button class="icons" (click)="functionSaveOnRegisterForm()">
       <fa-icon [icon]="faFloppyDisk"></fa-icon>
     </button>
-    <button mat-button class="icons">
+    <button mat-button class="icons" (click)="deleteProduct()">
       <fa-icon [icon]="faTrashCan"></fa-icon>
     </button>
     <span class="center-text">{{ pageActionTitle }} de Produtos</span>
     <div></div>
   </mat-toolbar-row>
 </mat-toolbar>
+
+<br />
+
+<app-register-form [productId]="productId"></app-register-form>

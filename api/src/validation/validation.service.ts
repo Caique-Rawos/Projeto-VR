@@ -19,7 +19,7 @@ export class ValidationService {
   }
 
   /**
-   * Verifica se a Descricao informado não esta vazia
+   * Verifica se a Descricao informado não esta vazia e possui no maximo 60 caracteres
    * @param descValue descricao informada
    * @returns booleano informando se esta valido
    */
@@ -27,7 +27,12 @@ export class ValidationService {
     if (!descValue) {
       return false;
     }
-    return descValue && descValue.trim() !== '';
+    return (
+      descValue &&
+      descValue.trim() !== '' &&
+      descValue.length > 0 &&
+      descValue.length <= 60
+    );
   }
 
   /**

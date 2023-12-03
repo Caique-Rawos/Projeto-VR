@@ -16,7 +16,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { HttpClientModule } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatRadioModule } from '@angular/material/radio';
@@ -27,6 +27,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ProductsTableComponent } from './components/products-table/products-table.component';
 import { OnlyNumberDirective } from './function/only-number.directive';
+import { RegisterFormComponent } from './components/register-form/register-form.component';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { ToastrModule } from 'ngx-toastr';
+import { MatDialogModule } from '@angular/material/dialog';
+import { SellPriceDialogComponent } from './components/sell-price-dialog/sell-price-dialog.component';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   declarations: [
@@ -35,6 +41,8 @@ import { OnlyNumberDirective } from './function/only-number.directive';
     RegisterProductComponent,
     ProductsTableComponent,
     OnlyNumberDirective,
+    RegisterFormComponent,
+    SellPriceDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -58,6 +66,11 @@ import { OnlyNumberDirective } from './function/only-number.directive';
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
+    MatGridListModule,
+    ToastrModule.forRoot(),
+    MatDialogModule,
+    MatSelectModule,
+    ReactiveFormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

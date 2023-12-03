@@ -1,0 +1,61 @@
+<h2 mat-dialog-title>
+  <table style="width: 100%">
+    <tr>
+      <td style="width: 10%">
+        <button mat-button (click)="saveSellPrice()">
+          <fa-icon [icon]="faFloppyDisk"></fa-icon>
+        </button>
+      </td>
+
+      <td style="width: 80%; text-align: center">{{ titleDialog }} de preço</td>
+
+      <td style="width: 10%">
+        <button mat-button mat-dialog-close>
+          <fa-icon [icon]="faXmark"></fa-icon>
+        </button>
+      </td>
+    </tr>
+  </table>
+</h2>
+
+<mat-dialog-content>
+  <table>
+    <tr>
+      <td>
+        <mat-form-field appearance="fill">
+          <mat-label>Loja</mat-label>
+          <mat-select
+            [formControl]="storeControl"
+            [(value)]="selectIdStore"
+            [disabled]="isDisabled"
+            [attr.readonly]="isReadOnly ? true : null"
+            required
+          >
+            <mat-option>--</mat-option>
+            <mat-option *ngFor="let store of stores" [value]="store.id">
+              {{ store.desc }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="storeControl.hasError('required')"
+            >Selecione uma Loja!</mat-error
+          >
+        </mat-form-field>
+      </td>
+      <td>
+        <mat-form-field floatLabel="always">
+          <mat-label>Preço de venda (R$)</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="0"
+            autocomplete="off"
+            appOnlyNumber
+            [decimal]="true"
+            [(ngModel)]="inputSellPrice"
+          />
+          <span matTextPrefix>R$&nbsp;</span>
+        </mat-form-field>
+      </td>
+    </tr>
+  </table>
+</mat-dialog-content>

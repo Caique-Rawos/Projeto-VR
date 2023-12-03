@@ -23,7 +23,7 @@ import {
 import { ProductsService } from './products.service';
 import { ProductsDto } from './dtos/products.dto';
 import { ProductModel } from './product.model';
-import { DefaultMessagesService } from 'src/default-messages/default-messages.service';
+import { DefaultMessagesService } from '../default-messages/default-messages.service';
 
 @ApiTags('products')
 @Controller('products')
@@ -41,7 +41,7 @@ export class ProductsController {
   async addProduct(@Body() productDto: ProductsDto): Promise<{ id: number }> {
     try {
       const generatedId = await this.productsService.insertProduct(
-        new ProductModel(productDto.desc, productDto.price, ''),
+        new ProductModel(productDto.desc, productDto.price, productDto.image),
       );
       return { id: generatedId };
     } catch (error) {
@@ -62,12 +62,12 @@ export class ProductsController {
     return this.productsService.getProducts();
   }
 
-  @Get(':id')
+  @Get('byid')
   @ApiOperation({ summary: 'Buscar produto cadastrado por Id' })
-  @ApiParam({ name: 'id', description: 'ID do produto' })
+  @ApiQuery({ name: 'id', required: false, description: 'ID do produto' })
   @ApiResponse({ status: 200, description: 'Produto obtido com sucesso' })
   @ApiResponse({ status: 404, description: 'Produto nao encontrado' })
-  async getProduct(@Param('id') prodId: number): Promise<ProductModel | null> {
+  async getProduct(@Query('id') prodId: number): Promise<ProductModel | null> {
     try {
       return await this.productsService.getSingleProduct(prodId);
     } catch (error) {

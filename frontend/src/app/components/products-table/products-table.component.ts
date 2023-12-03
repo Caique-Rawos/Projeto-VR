@@ -5,12 +5,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { ProductService } from '../../../app/service/product.service';
 import { faTrashCan, faPencil } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
-
-export interface ProductData {
-  id: number;
-  desc: string;
-  price: string;
-}
+import { ProductData } from '../../../app/interfaces/product';
 
 @Component({
   selector: 'app-products-table',
@@ -53,7 +48,7 @@ export class ProductsTableComponent implements AfterViewInit {
     } catch (error) {}
   }
 
-  async applyFilter(event: Event) {
+  async applyFilter() {
     if (!this.filtroId) {
       this.filtroId = '';
     }
@@ -80,7 +75,7 @@ export class ProductsTableComponent implements AfterViewInit {
   }
 
   deleteProduct(productId: number): void {
-    if (confirm('Deseja mesmo excluir este produto?')) {
+    if (confirm(`Deseja mesmo excluir o produto de codigo ${productId}?`)) {
       this.productService.deleteProduct(productId).subscribe(
         () => {
           window.location.reload();

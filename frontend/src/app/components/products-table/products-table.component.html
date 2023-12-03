@@ -7,18 +7,14 @@
           matInput
           type="text"
           [(ngModel)]="filtroId"
-          (keyup)="applyFilter($event)"
+          (keyup)="applyFilter()"
           appOnlyNumber
         />
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Descrição</mat-label>
-        <input
-          matInput
-          [(ngModel)]="filtroDesc"
-          (keyup)="applyFilter($event)"
-        />
+        <input matInput [(ngModel)]="filtroDesc" (keyup)="applyFilter()" />
       </mat-form-field>
 
       <mat-form-field floatLabel="always">
@@ -29,7 +25,7 @@
           placeholder="0"
           autocomplete="off"
           [(ngModel)]="filtroPrice"
-          (keyup)="applyFilter($event)"
+          (keyup)="applyFilter()"
           appOnlyNumber
           [decimal]="true"
         />
@@ -44,7 +40,7 @@
           placeholder="0"
           autocomplete="off"
           [(ngModel)]="filtroSell"
-          (keyup)="applyFilter($event)"
+          (keyup)="applyFilter()"
           appOnlyNumber
           [decimal]="true"
         />
@@ -88,6 +84,7 @@
         </div>
       </td>
     </ng-container>
+
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 

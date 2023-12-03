@@ -1,0 +1,39 @@
+@import "ngx-toastr/toastr";
+
+mat-card {
+  display: flex;
+  justify-content: center;
+}
+
+mat-form-field {
+  margin: 0 2%;
+}
+
+.container {
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+table {
+  width: 100%;
+}
+
+.mat-mdc-form-field {
+  font-size: 14px;
+  width: 100%;
+}
+
+td,
+th {
+  width: 25%;
+}
+
+.mat-grid-tile-content {
+  height: 30% !important;
+}
+
+fa-icon.gray {
+  font-size: 25px;
+  color: gray;
+}
