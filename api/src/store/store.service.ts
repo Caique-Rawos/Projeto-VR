@@ -35,27 +35,18 @@ export class StoreService {
    * @returns uma loja
    */
   async getSingleStore(storeId: number): Promise<StoreEntity> {
-    console.log('start');
-    console.log(storeId);
     if (!this.validationService.isValidId(storeId)) {
-      console.log('invalid');
       throw new BadRequestException(this.defaultMessagesService.ID_ERROR_MSG);
     }
     const product = await this.storeRepository.findOne({
       where: { id: storeId },
     });
 
-    console.log(product);
-
     if (!product) {
-      console.log('invalid product');
       throw new NotFoundException(
         this.defaultMessagesService.NOT_FOUND_ERROR_MSG,
       );
     }
-
-    console.log(product);
-    console.log('end');
 
     return product;
   }
