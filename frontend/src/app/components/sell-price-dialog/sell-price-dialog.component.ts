@@ -113,7 +113,7 @@ export class SellPriceDialogComponent implements AfterViewInit {
       } else {
         this.toastr.error(
           'Um ou mais campos obrigatórios não foram preenchidos corretamente.',
-          'Custo invalido'
+          'Preço de venda invalido'
         );
       }
     } else {
