@@ -11,7 +11,7 @@ import { StoreEntity } from './entities/store.entity';
       host: 'localhost',
       username: 'postgres',
       password: 'postgres',
-      database: 'postgres',
+      database: 'projeto_vr',
       entities: [ProductsEntity, ProductStoreEntity, StoreEntity],
       synchronize: true,
     }),
