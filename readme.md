@@ -2,7 +2,7 @@
 
 ## Vídeo Tutorial
 
-[![Assista ao Vídeo Tutorial](https://res.cloudinary.com/practicaldev/image/fetch/s--uBT6xRme--/c_imagga_scale,f_auto,fl_progressive,h_900,q_auto,w_1600/https://dev-to-uploads.s3.amazonaws.com/i/qibhtrfxpeoi9zqjltdq.png)](https://youtu.be/6NJnH05CYww)
+[![Assista ao Vídeo Tutorial](https://res.cloudinary.com/practicaldev/image/fetch/s--uBT6xRme--/c_imagga_scale,f_auto,fl_progressive,h_900,q_auto,w_1600/https://dev-to-uploads.s3.amazonaws.com/i/qibhtrfxpeoi9zqjltdq.png)](https://youtu.be/U_NRXrRAvSI)
 
 Assista ao vídeo acima para um guia passo a passo sobre como começar com este repositório.
 
